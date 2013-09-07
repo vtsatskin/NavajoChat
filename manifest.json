@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+
+  "name": "Facebook Message Encryption",
+  "description": "Encrypts your Facebook chat messages to prevent snooping",
+  "version": "0.0.1",
+
+  "permissions": [
+    "https://*.facebook.com/",
+    "http://*.facebook.com/"
+  ],
+
+  "web_accessible_resources": [ "lib/jquery-2.0.3.min.map" ],
+
+  "content_scripts": [
+    {
+      "matches": ["http://*.facebook.com/messages/*", "https://*.facebook.com/messages/*"],
+      "css": ["styles.css"],
+      "js": ["lib/jquery-2.0.3.min.js", "lib/openpgp.min.js", "script.js"]
+    }
+  ]
+}
