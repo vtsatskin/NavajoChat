@@ -36,11 +36,11 @@ $(function(){
 		var publicKey = openpgp.read_publicKey(keyPair.publicKeyArmored);
 
 		var encryptedMsg = openpgp.write_encrypted_message(publicKey, messageBox.value);
-		console.log(decryptMessage(openpgp.read_message(encryptedMsg)[0]));
-		// messageBox.value = encrypted;
+		messageBox.value = encryptedMsg;
 	}
 
-	function decryptMessage(msg) {
+	function decryptMessage(str) {
+		var msg = openpgp.read_message(str)[0];
 		var keymat = null;
 		var sesskey = null;
 		var priv_key = keyPair.privateKey;
@@ -71,6 +71,47 @@ $(function(){
 		}
 
 	    return false;
+	}
+
+	var messages = document.querySelector("#webMessengerRecentMessages");
+	messages.addEventListener("DOMNodeInserted", function (e) {
+		var messageGroup = $(e.target);
+		if(messageGroup.hasClass('webMessengerMessageGroup')) {
+			var cryptoText = "";
+			var cryptoNodes = [];
+			var isInsideCryptoBlock = false;
+			messageGroup.find('p').each(function(i, node){
+				var text = $(node).text();
+				if(containsCryptoHeader(text)) {
+					cryptoNodes.push($(node));
+					cryptoText += text + "\n\n";
+					isInsideCryptoBlock = true;
+				}
+				else if(containsCryptoFooter(text)) {
+					cryptoNodes.push($(node));
+					cryptoText += text;
+
+					var decryptedMessage = decryptMessage(cryptoText);
+					console.log(decryptedMessage);
+
+					cryptoText = "";
+					cryptoNodes = [];
+					isInsideCryptoBlock = false;
+				}
+				else if(isInsideCryptoBlock) {
+					cryptoNodes.push($(node));
+					cryptoText += text + "\n";
+				}
+			});
+		}
+	}, false);
+
+	function containsCryptoHeader(str) {
+		return str.search(/-----BEGIN PGP MESSAGE-----\n/) != -1
+	}
+
+	function containsCryptoFooter(str) {
+		return str.search(/-----END PGP MESSAGE-----/) != -1	
 	}
 
 });
