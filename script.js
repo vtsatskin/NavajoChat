@@ -103,7 +103,17 @@ $(function(){
 					cryptoText += text;
 
 					var decryptedMessage = decryptMessage(cryptoText);
-					console.log(decryptedMessage);
+					if(decryptedMessage) {
+						cryptoNodes.forEach( function(e, i) {
+							if(i == cryptoNodes.length - 1)
+								e.text(decryptedMessage);
+							else
+								e.remove();
+						});
+					}
+					else {
+						cryptoNodes.forEach( function(e) { e.remove(); });
+					}
 
 					cryptoText = "";
 					cryptoNodes = [];
