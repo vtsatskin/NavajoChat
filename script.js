@@ -38,6 +38,9 @@ $(function(){
 			console.log("Retrieved stored keypair");
 		}
 
+		// Parse messages on first load.
+		$("#webMessengerRecentMessages .webMessengerMessageGroup").each(function(i, e) { proccessMessageGroup($(e)); })
+
 		console.log(keyPair.publicKeyArmored);
 	});
 
@@ -114,13 +117,15 @@ $(function(){
 
 	var messages = document.querySelector("#webMessengerRecentMessages");
 	messages.addEventListener("DOMNodeInserted", function (e) {
-		var messageGroup = $(e.target);
+		proccessMessageGroup($(e.target));
+	}, false);
+
+	function proccessMessageGroup(messageGroup) {
 		if(messageGroup.hasClass('webMessengerMessageGroup')) {
 			findAndSavePublicKeys(messageGroup);
 			decryptMessageBox(messageGroup);
 		}
-
-	}, false);
+	}
 
 	function findAndSavePublicKeys(messageGroup) {
 		var hovercardLink = messageGroup.find('a[data-hovercard]');
