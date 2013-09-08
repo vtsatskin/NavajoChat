@@ -4,6 +4,8 @@ function showMessages(str) {
 }
 
 $(function(){
+	var handshakeRequestString = "I'm using Navajo to protect our privacy from online survelience systems. \
+								 You can find out more information at http://placeholder.secure"
 	openpgp.init();
 	var keyPair;
 
@@ -105,10 +107,14 @@ $(function(){
 					var decryptedMessage = decryptMessage(cryptoText);
 					if(decryptedMessage) {
 						cryptoNodes.forEach( function(e, i) {
-							if(i == cryptoNodes.length - 1)
+							if(i == cryptoNodes.length - 1) {
 								e.text(decryptedMessage);
-							else
+								var container = messageGroup.find('.timestamp').parents('.rfloat');
+								container.prepend('<a class="mrs _9k" role="button" aria-label="Encrypted with Navajo" data-hover="tooltip"><img class="secure-icon" src="' + chrome.extension.getURL("img/secure.png") + '"></a>');
+							}
+							else {
 								e.remove();
+							}
 						});
 					}
 					else {

@@ -11,11 +11,11 @@
     "storage"
   ],
 
-  "web_accessible_resources": [ "lib/jquery-2.0.3.min.map" ],
+  "web_accessible_resources": [ "lib/jquery-2.0.3.min.map", "img/secure.png" ],
 
   "content_scripts": [
     {
-      "matches": ["http://*.facebook.com/messages/*", "https://*.facebook.com/messages/*"],
+      "matches": ["http://*.facebook.com/*", "https://*.facebook.com/*"],
       "css": ["styles.css"],
       "js": ["lib/jquery-2.0.3.min.js", "lib/openpgp.min.js", "script.js"]
     }
