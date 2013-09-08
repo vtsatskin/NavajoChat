@@ -9,7 +9,6 @@ $(function(){
 	openpgp.init();
 	var keyPair;
 	var friendPublicKeys = {};
-	var friendPublicArmoredKeys = {};
 
 	chrome.storage.sync.get(['privateKey', 'publicKey'], function(items) {
 		if(Object.keys(items).length == 0) {
@@ -37,14 +36,13 @@ $(function(){
 			}
 			console.log("Retrieved stored keypair");
 		}
+
+		console.log(keyPair.publicKeyArmored);
 	});
 
 	chrome.storage.sync.get('friendPublicKeys', function(items) {
 		if(Object.keys(items).length) {
-			friendPublicArmoredKeys = items.friendPublicKeys;
-			friendPublicKeys = Object.keys(items.friendPublicKeys).map(function(key) {
-				openpgp.read_publicKey(items.friendPublicKeys[key])[0];
-			});
+			friendPublicKeys = items.friendPublicKeys;
 		}
 	});
 
@@ -61,16 +59,18 @@ $(function(){
 	function encryptMessage() {
 		if(keyPair == null) return;
 
-		var friendUserId = findFriendId();
-		var friendPublicKey = friendPublicKeys[friendUserId];
 		var publicKey = openpgp.read_publicKey(keyPair.publicKeyArmored);
 		encryptedMsg = openpgp.write_encrypted_message(publicKey, messageBox.value);
 
+		var friendUserId = findFriendId();
+		var friendPublicKey = friendPublicKeys[friendUserId];
 		if(friendPublicKey) {
-			publicKey = friendPublicKeys[friendUserId];
+			publicKey = openpgp.read_publicKey(friendPublicKey);
 			encryptedMsg += "\n" + openpgp.write_encrypted_message(publicKey, messageBox.value);
 		}
-		
+
+		encryptedMsg += "\n" + keyPair.publicKeyArmored;
+
 		messageBox.value = encryptedMsg;
 	}
 
@@ -79,6 +79,9 @@ $(function(){
 		var keymat = null;
 		var sesskey = null;
 		var priv_key = keyPair.privateKey;
+
+		if(typeof(msg.sessionKeys) == 'undefined') return false;
+
 		// Find the private (sub)key for the session key of the message
 		for (var i = 0; i< msg.sessionKeys.length; i++) {
 			if (priv_key.privateKeyPacket.publicKey.getKeyId() == msg.sessionKeys[i].keyId.bytes) {
@@ -140,20 +143,16 @@ $(function(){
 				cryptoNodes.forEach( function(e) { e.remove(); });
 				if(messageGroup.find('p').length == 0) {
 					// No more non-crypto messages left.
-					messageGroup.remove();
+					// messageGroup.remove();
 				}
 
 				if(!currentUsersMessage) {
-					var publicKey = openpgp.read_publicKey(cryptoText)[0];
-					if(publicKey) {
-						var friendId = findFriendId();
-						friendPublicKeys[friendId] = publicKey;
-						friendPublicArmoredKeys[friendId] = cryptoText;
+					var friendId = findFriendId();
+					friendPublicKeys[friendId] = cryptoText;
 
-						messageGroup.remove();
-						console.log("found friend's public key");
-						chrome.storage.sync.set({ 'friendPublicKeys': friendPublicArmoredKeys });
-					}
+					// messageGroup.remove();
+					console.log("found friend's public key");
+					chrome.storage.sync.set({ 'friendPublicKeys': friendPublicKeys });
 				}
 
 				cryptoText = "";
