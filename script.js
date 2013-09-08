@@ -4,8 +4,9 @@ function showMessages(str) {
 }
 
 $(function(){
-	var handshakeRequestString = "I'm using Navajo to protect our privacy from online survelience systems. \
-								 You can find out more information at http://placeholder.secure"
+	var handshakeRequestString  = "I'm using Navajo to protect our privacy from online survelience systems.";
+	   	handshakeRequestString += "You can find out more information at http://placeholder.secure";
+
 	openpgp.init();
 	var keyPair;
 	var friendPublicKeys = {};
@@ -50,7 +51,7 @@ $(function(){
 
 	function handleKeyDown(e) {
 		var sendWithButton = document.querySelector("._1rh");
-		if(e.which == 13) {
+		if(e.which == 13 && encryptionToggle.hasClass('active')) {
 			encryptMessage();
 		}
 	}
@@ -239,5 +240,19 @@ $(function(){
 		
 		return cachedCurrentUserId;
 	}
+
+	$(messageBox).after($('<div class="navajo-toggle">Use Encryption <div class="navajo-checkbox active"></div></div>'));
+	var encryptionToggle = $('.navajo-checkbox');
+
+	encryptionToggle.click(function() {
+		if(encryptionToggle.hasClass('active')) {
+			encryptionToggle.removeClass('active');
+			encryptionToggle.addClass('disabled');
+		}
+		else {
+			encryptionToggle.removeClass('disabled');
+			encryptionToggle.addClass('active');
+		}
+	});
 
 });

@@ -2,3 +2,26 @@
 	display: inline-block;
 	vertical-align: middle;
 }
+
+.navajo-toggle {
+	float: right;
+	margin-right: -16px;
+	color: #A6A6B6;
+}
+.navajo-checkbox {
+	background-image: url(/rsrc.php/v2/yL/r/q4RHt7ylW-5.png);
+	background-repeat: no-repeat;
+	background-size: auto;
+	display: inline-block;
+	width: 14px;
+	height: 17px;
+	margin-left: 5px;
+	vertical-align: middle;
+}
+
+.navajo-checkbox.active {
+	background-position: -36px -172px;
+}
+.navajo-checkbox.disabled {
+	background-position: -51px -172px;
+}
