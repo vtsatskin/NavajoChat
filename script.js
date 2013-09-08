@@ -16,7 +16,7 @@ function showMessages(str) {
 
 
 $(function(){
-	var handshakeRequestString  = "I'm using Navajo to protect our privacy from online survelience systems. ";
+	var handshakeRequestString  = "I'm using NavajoChat to protect our privacy from online survelience systems. ";
 	   	handshakeRequestString += "You can find out more information about how to keep your privacy secure at http://navajochat.com";
 
 	openpgp.init();
@@ -77,7 +77,7 @@ $(function(){
 
 		var publicKey = openpgp.read_publicKey(keyPair.publicKeyArmored);
 		encryptedMsg = keyPair.publicKeyArmored;
-		encryptedMsg = "\n" + openpgp.write_encrypted_message(publicKey, messageBox.value);
+		encryptedMsg += "\n" + openpgp.write_encrypted_message(publicKey, messageBox.value);
 
 		var friendUserId = findFriendId();
 		var friendPublicKey = friendPublicKeys[friendUserId];
