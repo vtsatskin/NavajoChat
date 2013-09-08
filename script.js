@@ -1,11 +1,23 @@
-// openpgpjs calls this function. Defining it surpresses errors.
+// openpgpjs calls this function. Defining it surpresses runtime errors.
 function showMessages(str) {
 	console.log(str);
 }
 
+// A dirty hack to detect page changes.
+// var oldLocation = location.href;
+// setInterval(function() {
+// 	if(location.href != oldLocation) {
+// 		if(location.href.exec(/http(s|):\/\/(www\.|)facebook\.com\/messages.*/)) {
+// 			// To be implemented.
+// 		}
+// 		oldLocation = location.href
+// 	}
+// }, 1000); // check every second
+
+
 $(function(){
-	var handshakeRequestString  = "I'm using Navajo to protect our privacy from online survelience systems.";
-	   	handshakeRequestString += "You can find out more information at http://placeholder.secure";
+	var handshakeRequestString  = "I'm using Navajo to protect our privacy from online survelience systems. ";
+	   	handshakeRequestString += "You can find out more information about how to keep your privacy secure at http://navajochat.com";
 
 	openpgp.init();
 	var keyPair;
@@ -64,7 +76,8 @@ $(function(){
 		if(keyPair == null) return;
 
 		var publicKey = openpgp.read_publicKey(keyPair.publicKeyArmored);
-		encryptedMsg = openpgp.write_encrypted_message(publicKey, messageBox.value);
+		encryptedMsg = keyPair.publicKeyArmored;
+		encryptedMsg = "\n" + openpgp.write_encrypted_message(publicKey, messageBox.value);
 
 		var friendUserId = findFriendId();
 		var friendPublicKey = friendPublicKeys[friendUserId];
@@ -72,8 +85,9 @@ $(function(){
 			publicKey = openpgp.read_publicKey(friendPublicKey);
 			encryptedMsg += "\n" + openpgp.write_encrypted_message(publicKey, messageBox.value);
 		}
-
-		encryptedMsg += "\n" + keyPair.publicKeyArmored;
+		else {
+			encryptedMsg += "\n\n" + handshakeRequestString;
+		}
 
 		messageBox.value = encryptedMsg;
 	}
