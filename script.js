@@ -7,17 +7,28 @@ $(function(){
 	openpgp.init();
 	var keyPair;
 
-	chrome.storage.sync.get('keyPair', function(items) {
+	chrome.storage.sync.get(['privateKey', 'publicKey'], function(items) {
 		if(Object.keys(items).length == 0) {
 			console.log("No key pair found.");
 			console.log("Generating key pair...");
-			keyPair = openpgp.generate_key_pair(1, 512, "User Name", "");
+			keyPair = openpgp.generate_key_pair(1, 2048, "User Name", "");
 			console.log("Generated key pair.");
-			chrome.storage.sync.set({'keyPair': keyPair});
+
+			// Storing armored text to reduce size of data due to Chrome Storage constraints
+			chrome.storage.sync.set({
+				'privateKey': keyPair.privateKeyArmored,
+				'publicKey': keyPair.publicKeyArmored,
+			});
 		}
 		else {
+			// Reconstructing keyPair to be similiar to output from openpgp.generate_key_pair()
+			var privateKey = openpgp.read_privateKey(items.privateKey)[0];
+			keyPair = {
+				privateKey: privateKey,
+				privateKeyArmored: items.privateKey,
+				publicKeyArmored: items.publicKey,
+			}
 			console.log("Retrieved stored keypair");
-			keyPair = items.keyPair;
 		}
 	});
 
